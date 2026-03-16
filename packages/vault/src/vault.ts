@@ -1,4 +1,4 @@
-import { mkdir, open, readFile, realpath, stat } from "node:fs/promises";
+import { copyFile, mkdir, open, readFile, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 
 import {
@@ -12,6 +12,7 @@ import {
 } from "@obsidianhub/core";
 
 import { type VaultPathResolution, resolveVaultPath } from "./paths.js";
+import { splitFrontmatterDocument, type VaultDocumentParts } from "./frontmatter.js";
 
 export interface VaultLocation {
   rootPath: string;
@@ -25,13 +26,23 @@ export interface VaultTextReadOptions {
   encoding?: BufferEncoding;
 }
 
+export interface VaultNoteReadResult extends VaultTextFile {
+  document: VaultDocumentParts;
+}
+
 export interface VaultFrontmatterMutation {
   mode: "replace" | "merge";
   data: Record<string, unknown>;
 }
 
 export interface VaultWriteStrategy {
-  mode?: "direct" | "atomic";
+  mode?: "direct";
+}
+
+export interface VaultBackupOptions {
+  enabled?: boolean;
+  directory?: string;
+  suffix?: string;
 }
 
 export interface VaultTextWriteOptions extends VaultOperationOptions {
@@ -41,6 +52,7 @@ export interface VaultTextWriteOptions extends VaultOperationOptions {
   expectedMtimeMs?: number;
   frontmatter?: VaultFrontmatterMutation;
   writeStrategy?: VaultWriteStrategy;
+  backup?: VaultBackupOptions;
 }
 
 export interface VaultTextFile {
@@ -59,6 +71,13 @@ export interface VaultWriteReceipt {
   bytesWritten: number;
   created: boolean;
   mtimeMs: number;
+  backup?: VaultBackupReceipt;
+}
+
+export interface VaultBackupReceipt {
+  path: string;
+  absolutePath: string;
+  bytesCopied: number;
 }
 
 export class Vault {
@@ -109,6 +128,21 @@ export class Vault {
     }
   }
 
+  async readNote(
+    inputPath: string,
+    options: VaultTextReadOptions = {},
+  ): Promise<Result<VaultNoteReadResult, NotFoundError | PathAccessError>> {
+    const readResult = await this.readText(inputPath, options);
+    if (!readResult.ok) {
+      return readResult;
+    }
+
+    return ok({
+      ...readResult.value,
+      document: splitFrontmatterDocument(readResult.value.content),
+    });
+  }
+
   async writeText(
     inputPath: string,
     content: string,
@@ -126,12 +160,8 @@ export class Vault {
       );
     }
 
-    if (options.writeStrategy?.mode === "atomic") {
-      return err(
-        new ValidationError("Atomic write mode is not implemented yet.", {
-          path: inputPath,
-        }),
-      );
+    if (options.writeStrategy?.mode && options.writeStrategy.mode !== "direct") {
+      return err(new ValidationError("Unsupported vault write strategy.", { path: inputPath }));
     }
 
     try {
@@ -169,6 +199,10 @@ export class Vault {
       }
 
       if (options.dryRun) {
+        const backup = await this.planBackup(resolvedPath, existingStat?.size ?? 0, options.backup, {
+          onlyIfExists: !!existingStat,
+        });
+
         return ok({
           path: resolvedPath.normalizedPath,
           absolutePath: resolvedPath.absolutePath,
@@ -176,6 +210,7 @@ export class Vault {
           bytesWritten: Buffer.byteLength(content, encoding),
           created: !existingStat,
           mtimeMs: existingStat?.mtimeMs ?? 0,
+          backup,
         });
       }
 
@@ -183,6 +218,7 @@ export class Vault {
         await mkdir(path.dirname(resolvedPath.absolutePath), { recursive: true });
       }
 
+      const backup = await this.createBackupIfNeeded(resolvedPath, existingStat?.size ?? 0, options.backup);
       const handle = await open(resolvedPath.absolutePath, overwrite ? "w" : "wx");
 
       try {
@@ -200,6 +236,7 @@ export class Vault {
         bytesWritten: Buffer.byteLength(content, encoding),
         created: !existingStat,
         mtimeMs: nextStat.mtimeMs,
+        backup,
       });
     } catch (error) {
       if (
@@ -224,6 +261,47 @@ export class Vault {
 
     await this.assertRealPathWithinRoot(resolvedPath.absolutePath);
     return resolvedPath;
+  }
+
+  private async createBackupIfNeeded(
+    resolvedPath: VaultPathResolution,
+    bytesCopied: number,
+    options: VaultBackupOptions | undefined,
+  ): Promise<VaultBackupReceipt | undefined> {
+    const backup = await this.planBackup(resolvedPath, bytesCopied, options, { onlyIfExists: true });
+
+    if (!backup) {
+      return undefined;
+    }
+
+    await mkdir(path.dirname(backup.absolutePath), { recursive: true });
+    await copyFile(resolvedPath.absolutePath, backup.absolutePath);
+    return backup;
+  }
+
+  private async planBackup(
+    resolvedPath: VaultPathResolution,
+    bytesCopied: number,
+    options: VaultBackupOptions | undefined,
+    context: { onlyIfExists: boolean },
+  ): Promise<VaultBackupReceipt | undefined> {
+    if (options?.enabled !== true || !context.onlyIfExists) {
+      return undefined;
+    }
+
+    const backupRoot = resolveVaultPath(this.rootPath, options?.directory ?? ".obsidianhub/backups");
+    const timestamp = new Date().toISOString().replaceAll(":", "-");
+    const suffix = options?.suffix ?? ".bak";
+    const backupPath = `${backupRoot.normalizedPath}/${resolvedPath.normalizedPath}.${timestamp}${suffix}`;
+    const resolvedBackupPath = resolveVaultPath(this.rootPath, backupPath);
+
+    await this.assertParentWithinRoot(resolvedBackupPath.absolutePath);
+
+    return {
+      path: resolvedBackupPath.normalizedPath,
+      absolutePath: resolvedBackupPath.absolutePath,
+      bytesCopied,
+    };
   }
 
   private async assertParentWithinRoot(targetPath: string): Promise<void> {
