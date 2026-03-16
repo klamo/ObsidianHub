@@ -13,7 +13,11 @@
   },
   "files": ["dist"],
   "scripts": {
+    "prebuild": "corepack pnpm --filter @obsidianhub/core build",
     "build": "tsc -p tsconfig.json",
+    "pretest": "corepack pnpm --filter @obsidianhub/vault build",
+    "test": "node --test test/**/*.test.mjs",
+    "pretypecheck": "corepack pnpm --filter @obsidianhub/core build",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "clean": "rm -rf dist *.tsbuildinfo"
   },
