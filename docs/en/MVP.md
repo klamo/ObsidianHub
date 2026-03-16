@@ -6,8 +6,9 @@ Validate whether the following value proposition holds:
 
 1. users are willing to mount a personal vault into a self-hosted service
 2. remote access plus basic web management solves a real problem
-3. a controlled read/write API for agents is a meaningful differentiator
-4. safe writes plus snapshot rollback materially improve user trust
+3. users are willing to keep working in local Obsidian while connecting to their own server through a lightweight plugin
+4. a controlled read/write API for agents is a meaningful differentiator
+5. real-time work-state sync plus Git checkpoints plus snapshot rollback improve both usability and trust
 
 ## 2. Included in MVP
 
@@ -19,8 +20,7 @@ Validate whether the following value proposition holds:
 ### Setup and admin
 - setup wizard
 - admin account creation
-- vault path setting
-- data path setting
+- fixed mounted path convention (such as `/data/vault` and `/data/app`)
 - initial agent token setup
 - automatic snapshot toggle and retention settings
 
@@ -34,6 +34,27 @@ Validate whether the following value proposition holds:
 - `create_note`
 - `list_tags`
 - `update_frontmatter`
+
+### Real-time work-state sync
+- Sync API
+- local change upload
+- latest remote state fetch
+- basic sync status display
+- basic conflict signaling
+
+### Lightweight Obsidian plugin prototype
+- server address configuration
+- token / credential configuration
+- connection test
+- manual sync action
+- Git / sync status display
+- uncommitted change indication
+
+### Git version layer
+- local Git repository detection or initialization (optional enablement)
+- manual version creation
+- checkpoint commit capability
+- recent commit inspection
 
 ### Safe write features
 - atomic writes
@@ -54,14 +75,19 @@ Validate whether the following value proposition holds:
 - multi-tenancy
 - team sharing
 - complex RBAC / ACL
-- real-time collaborative editing
+- heavy real-time collaborative editing
+- CRDT / OT
 - plugin marketplace
 - advanced publishing system
+- complex multi-branch collaborative workflows
+- complex merge UI
 
 ## 4. MVP Success Criteria
 
 - the service can be started quickly with Docker
 - users can complete setup and bind a vault
-- users can remotely inspect basic content through the web
+- users can continue working inside Obsidian while connecting to their own service
+- multiple devices can sync current work state
+- Git preserves stable version checkpoints rather than committing every save
 - agents can safely read/write within allowed paths through the API
 - conflicts or mistaken writes can be recovered
