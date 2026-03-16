@@ -167,6 +167,7 @@ The first version should start with a single-container deployment, and split lat
 
 ### Phase 3
 - compatibility features (such as WebDAV / import-export)
+- client CLI execution channel (if it proves worthwhile)
 - richer agent workflows
 - release and deployment improvements
 
@@ -178,3 +179,4 @@ The repository is in initialization stage. Current priorities are:
 2. finalize the MVP tech stack and client connection direction
 3. create the minimum project skeleton
 4. prioritize the design of the Vault Access Layer, Sync API, and Git checkpoint mechanism
+t checkpoint mechanism
