@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build outputs
+.next/
+dist/
+build/
+coverage/
+
+# env
+.env
+.env.*
+!.env.example
+
+# runtime data
+*.log
+
+# app data mounts
+/data/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# plugin / package temp
+*.tsbuildinfo

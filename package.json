@@ -1,0 +1,12 @@
+{
+  "name": "obsidianhub",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.6.5",
+  "scripts": {
+    "dev": "echo 'workspace skeleton stage: app dev scripts will be added after base scaffold'",
+    "build": "echo 'workspace skeleton stage: build scripts will be added after base scaffold'",
+    "lint": "echo 'workspace skeleton stage: lint scripts will be added after base scaffold'",
+    "typecheck": "echo 'workspace skeleton stage: typecheck scripts will be added after base scaffold'"
+  }
+}
