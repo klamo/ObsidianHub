@@ -134,6 +134,7 @@ ObsidianHub 的目标不是替代 Obsidian，而是为个人 Obsidian vault 增�
 - [Tech Stack (English)](docs/en/TECH-STACK.md)
 - [Client Connection (English)](docs/en/CLIENT-CONNECTION.md)
 - [Sync and Versioning (English)](docs/en/SYNC-AND-VERSIONING.md)
+- [Development Collaboration Protocol (English)](docs/en/DEVELOPMENT-COLLABORATION-PROTOCOL.md)
 
 ## Docker 交付
 
