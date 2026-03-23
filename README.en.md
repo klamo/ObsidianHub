@@ -135,6 +135,7 @@ Each agent may have:
 - [Client Connection (English)](docs/en/CLIENT-CONNECTION.md)
 - [Sync and Versioning (English)](docs/en/SYNC-AND-VERSIONING.md)
 - [Development Collaboration Protocol (English)](docs/en/DEVELOPMENT-COLLABORATION-PROTOCOL.md)
+- [Development Collaboration Rules (English)](docs/en/DEVELOPMENT-COLLABORATION-RULES.md)
 
 ## Docker Delivery
 
