@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@obsidianhub/core": ["../core/dist/index.d.ts"],
+      "@obsidianhub/vault": ["../vault/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

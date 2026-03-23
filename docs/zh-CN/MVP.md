@@ -27,13 +27,14 @@
 ### Agent API
 - `list_files`
 - `read_note`
-- `write_note`
+- `create_note`
+- `update_note_body`
+- `update_frontmatter`
+- `rename_note`
+- `archive_note`
 - `append_note`
 - `search`
-- `move_note`
-- `create_note`
 - `list_tags`
-- `update_frontmatter`
 
 ### 实时工作态同步
 - Sync API

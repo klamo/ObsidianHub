@@ -22,7 +22,8 @@
       "@obsidianhub/sync": ["packages/sync/src/index.ts"],
       "@obsidianhub/git": ["packages/git/src/index.ts"],
       "@obsidianhub/search": ["packages/search/src/index.ts"],
-      "@obsidianhub/config": ["packages/config/src/index.ts"]
+      "@obsidianhub/config": ["packages/config/src/index.ts"],
+      "@obsidianhub/actions": ["packages/actions/src/index.ts"]
     }
   }
 }

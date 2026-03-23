@@ -1,0 +1,28 @@
+{
+  "name": "@obsidianhub/actions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "prebuild": "corepack pnpm --filter @obsidianhub/core build && corepack pnpm --filter @obsidianhub/vault build",
+    "build": "tsc -p tsconfig.json",
+    "pretypecheck": "corepack pnpm --filter @obsidianhub/core build && corepack pnpm --filter @obsidianhub/vault build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pretest": "corepack pnpm --filter @obsidianhub/actions build",
+    "test": "node --test test/**/*.test.mjs",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@obsidianhub/core": "workspace:*",
+    "@obsidianhub/vault": "workspace:*"
+  }
+}
